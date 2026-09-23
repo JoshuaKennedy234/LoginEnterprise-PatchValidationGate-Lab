@@ -1,0 +1,71 @@
+{
+  "provenance": "synthetic",
+  "complete": true,
+  "run": {
+    "id": "synthetic-run",
+    "state": "completed",
+    "result": "successful",
+    "appFailureResults": {
+      "successCount": 1,
+      "totalCount": 2
+    },
+    "testId": "test-1"
+  },
+  "overview": {
+    "applicationTestResult": [
+      {
+        "testRunId": "synthetic-run",
+        "state": "completed",
+        "testResult": "successful",
+        "isBase": true,
+        "platformSummary": {
+          "loginSuccessful": true
+        },
+        "applicationSummaries": [
+          {
+            "applicationId": "notepad",
+            "appExecutionSuccessful": true
+          },
+          {
+            "applicationId": "demo-app",
+            "appExecutionSuccessful": false
+          }
+        ]
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "testRunId": "synthetic-run",
+      "loginState": "succeeded"
+    }
+  ],
+  "executions": [
+    {
+      "id": "execution-1",
+      "testRunId": "synthetic-run",
+      "userSessionId": "session-1",
+      "applicationId": "notepad",
+      "state": "ended"
+    },
+    {
+      "id": "execution-2",
+      "testRunId": "synthetic-run",
+      "userSessionId": "session-1",
+      "applicationId": "demo-app",
+      "state": "endedWithErrors"
+    }
+  ],
+  "events": [
+    {
+      "applicationId": "demo-app",
+      "testRunId": "synthetic-run",
+      "userSessionId": "session-1",
+      "eventType": "applicationFailure"
+    }
+  ],
+  "measurements": [],
+  "screenshots": [],
+  "errors": []
+}

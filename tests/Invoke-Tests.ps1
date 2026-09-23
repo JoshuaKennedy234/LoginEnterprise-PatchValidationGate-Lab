@@ -1,0 +1,68 @@
+<#
+.SYNOPSIS
+    Runs the Pester tests.
+.DESCRIPTION
+    Runs tests/unit by default. Those need no appliance and no network. With
+    -Integration the tests/integration suite runs as well; it skips itself when
+    LE_BASE_URL and LE_API_TOKEN are not set.
+
+    Private NUnit XML and a publication-safe count summary go to tests/results.
+    The script exits non-zero when any test fails.
+.PARAMETER Integration
+    Also run tests/integration.
+.PARAMETER IntegrationOnly
+    Run only tests/integration.
+.PARAMETER Output
+    Pester output verbosity. Default Detailed.
+.EXAMPLE
+    .\tests\Invoke-Tests.ps1
+.EXAMPLE
+    .\tests\Invoke-Tests.ps1 -Integration
+#>
+[CmdletBinding()]
+param(
+    [switch]$Integration,
+    [switch]$IntegrationOnly,
+    [ValidateSet('None', 'Normal', 'Detailed', 'Diagnostic')]
+    [string]$Output = 'Detailed'
+)
+
+$ErrorActionPreference = 'Stop'
+$env:LEGATE_TEST_MODE = 'true'
+
+Import-Module -Name Pester -RequiredVersion 5.7.1 -ErrorAction Stop
+
+$root = $PSScriptRoot
+$paths = @()
+if (-not $IntegrationOnly) { $paths += Join-Path -Path $root -ChildPath 'unit' }
+if ($Integration -or $IntegrationOnly) { $paths += Join-Path -Path $root -ChildPath 'integration' }
+
+$resultsFolder = Join-Path -Path $root -ChildPath 'results'
+if (-not (Test-Path -Path $resultsFolder)) { New-Item -ItemType Directory -Path $resultsFolder | Out-Null }
+
+$config = New-PesterConfiguration
+$config.Run.Path = $paths
+$config.Run.Exit = $false
+$config.Run.PassThru = $true
+$config.Output.Verbosity = $Output
+$config.TestResult.Enabled = $true
+$config.TestResult.OutputFormat = 'NUnitXml'
+$config.TestResult.OutputPath = Join-Path -Path $resultsFolder -ChildPath 'pester.xml'
+
+$result = Invoke-Pester -Configuration $config
+
+if ($null -eq $result) {
+    Write-Error 'Pester returned no result.'
+    exit 1
+}
+
+$summary = @{ shellMajorVersion = $PSVersionTable.PSVersion.Major; passed = $result.PassedCount; failed = $result.FailedCount; skipped = $result.SkippedCount; provenance = 'offline-synthetic-and-mocked' }
+if ($Integration -or $IntegrationOnly) { $summary.provenance = 'integration-requested-check-skips' }
+$summary | ConvertTo-Json | Set-Content -LiteralPath (Join-Path -Path $resultsFolder -ChildPath ('summary-' + $PSVersionTable.PSVersion.Major + '.json')) -Encoding utf8
+
+if ($result.FailedCount -gt 0) {
+    Write-Error ('{0} test(s) failed.' -f $result.FailedCount)
+    exit 1
+}
+
+exit 0

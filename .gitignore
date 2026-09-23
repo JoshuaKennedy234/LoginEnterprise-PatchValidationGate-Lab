@@ -1,0 +1,12 @@
+evidence/
+*.local.json
+*.local.ps1
+.env
+.vscode/
+*.log
+Thumbs.db
+tests/results/
+.private/
+.published/
+.state/
+.download/
