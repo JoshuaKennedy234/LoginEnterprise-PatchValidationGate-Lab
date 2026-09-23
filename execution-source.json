@@ -1,9 +1,9 @@
 {
   "sourceRepository": "LoginVSI/LoginEnterprise-PatchValidationGate",
-  "sourceCommit": "2a065cfb64740b5fdb3c10009b50626b821e341d",
+  "sourceCommit": "37df135d3c86b3b13604bbc251673a476be92a56",
   "executionRepository": "JoshuaKennedy234/LoginEnterprise-PatchValidationGate-Lab",
   "allowedRef": "refs/heads/main",
   "publicRepository": true,
-  "generatedAt": "2026-09-23T21:48:11.5942673Z",
+  "generatedAt": "2026-09-23T22:27:05.2071464Z",
   "transformation": "Exact execution-repository guard only; no wildcard or ref relaxation. Public execution copy omits pull-request CI; push CI on main is retained."
 }
