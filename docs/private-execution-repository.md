@@ -13,7 +13,7 @@ permissions, environment gate, concurrency and evidence guards remain intact.
 The command makes no GitHub calls and refuses to overwrite existing exports.
 
 Later, under separate authorization:
-1. Create the private personal repository with Actions disabled initially.
+1. Select the execution repository visibility deliberately and keep Actions disabled initially. Preserve the visibility of an existing repository.
 2. Review and import the generated files to protected main. Retain the source
    commit record. Never copy local configuration, credential stores or captures.
 3. Configure an isolated Windows runner, private durable state/evidence roots,
@@ -24,7 +24,7 @@ Later, under separate authorization:
 
 For each update, export a fresh reviewed development commit for the same exact
 execution repository. Review the generated diff and import it through the
-private repository's protected update process. Put implementation fixes back
+execution repository's protected update process. Put implementation fixes back
 in the development repository, then regenerate. Do not edit divergent copies.
 
 Local acceptance does not validate GitHub environments, runner isolation,
@@ -36,8 +36,18 @@ acceptance items; a generated export is preparation, not a deployment.
 Public visibility is supported for the generated source and reviewed evidence.
 Pass `-PublicRepository` to the exporter for a public execution repository.
 The export records this choice in `execution-source.json` and removes the
-`pull_request` CI trigger. Push CI on `main` remains on GitHub-hosted Windows
-runners. Development PR validation stays in the LoginVSI source repository.
+`pull_request` CI trigger. Push CI on `main` and `chore/sync-*` branches runs on
+GitHub-hosted Windows runners. Publish generated updates on a trusted writer's
+`chore/sync-*` branch so `offline-powershell` and `offline-pwsh` report on the PR
+before protected merge. Development PR validation stays in the LoginVSI source
+repository.
+
+A successful manual CI dispatch does not supply the PR's required checks.
+GitHub [evaluates only eligible event types for PR checks](https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks#checks-from-some-workflow-jobs-are-not-evaluated),
+including `push` but excluding `workflow_dispatch`. Confirm both required checks
+on the current PR head and the required independent review before merging.
+The sync-branch trigger runs offline CI only; live dispatch remains restricted
+to the exact execution repository and `main`.
 
 This difference is necessary before attaching a lab runner. A pull request can
 change a workflow's runner selection; the current `windows-latest` value alone
